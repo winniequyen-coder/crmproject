@@ -125,6 +125,17 @@ export default {
    if(!/^[a-f0-9]{40}$/i.test(expected))return respond({error:"Expected GitHub SHA required in If-Match"},428);
    let payload;try{const raw=await req.text();if(raw.length>3_000_000)throw new Error("Payload too large");payload=JSON.parse(raw)}catch(e){return respond({error:"Invalid JSON: "+e.message},400)}
    if(payload.schema!==21||!payload.data||!Array.isArray(payload.data.mainTasks)||!Array.isArray(payload.data.hubTasks))return respond({error:"Invalid data schema"},400);
+   if(cfg(env).branch==="main")return respond({error:"Writing shared data to main is forbidden"},403);
+   for(const [name,arr] of [["mainTasks",payload.data.mainTasks],["hubTasks",payload.data.hubTasks]]) {
+     const ids=new Set();
+     for(const t of arr) {
+       if(!t||typeof t.TaskID!=="string"||!t.TaskID.trim()||ids.has(t.TaskID))return respond({error:"Missing or duplicate Task ID in "+name},400);
+       ids.add(t.TaskID);
+       if(typeof t.Task!=="string")return respond({error:"Invalid task name in "+name},400);
+       if(t.ReportedPct!==undefined&&(typeof t.ReportedPct!=="number"||t.ReportedPct<0||t.ReportedPct>1))return respond({error:"Invalid task progress in "+name},400);
+     }
+     if(arr.some(t=>t.ParentID&&!ids.has(t.ParentID)))return respond({error:"Broken Parent ID hierarchy in "+name},400);
+   }
    if(payload.data.mainTasks.length>10000||payload.data.hubTasks.length>10000)return respond({error:"Task count exceeds safety limit"},400);
    let current;try{current=await githubGet(env)}catch(e){return respond({error:e.message},502)}
    if(current.sha!==expected)return respond({error:"CONFLICT",message:"Another user updated the shared file. Reload before saving.",currentSha:current.sha},409);
