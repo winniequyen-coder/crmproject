@@ -1,0 +1,13 @@
+name = "pcg-crm-shared-data-preview"
+main = "worker.js"
+compatibility_date = "2026-11-10"
+workers_dev = false
+
+[vars]
+DATA_REPO = "winniequyen-coder/crmproject"
+DATA_BRANCH = "preview/dashboard-data-v20-8"
+DATA_FILE = "data/project-data.json"
+ALLOWED_ORIGINS = "https://winniequyen-coder.github.io"
+ACCESS_TEAM_DOMAIN = ""
+ACCESS_AUD = ""
+ADMIN_EMAILS = ""
