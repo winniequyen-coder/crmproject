@@ -119,8 +119,8 @@ return[{title:'GO-LIVE & CHƯA GO-LIVE QUÁ HẠN',rows:sort(go)},{title:'WORKSH
 
 function renderGoLive(r){
 const groups=goLiveRows(currentView,r),R=D(r);
-const row=t=>{const overdue=t.RecalcPct<.999999&&t.PlanEnd<r,done=t.RecalcPct>=.999999,status=done?'Đã hoàn thành':overdue?'Quá hạn · Chưa hoàn tất':t.CalcStatus,css=done?'done':overdue?'delay':'ready';
-return '<div class="go-live-item" data-jump="'+datasetOf(t)+'|'+E(t.TaskID)+'"><div class="go-live-name" title="'+E(t.Task)+'">'+E(t.Task)+'</div><div class="go-live-meta"><span>'+E(t.TaskID)+'</span><span>Hạn: '+F(t.PlanEnd)+'</span><span class="go-live-chip '+css+'">'+E(status)+'</span></div></div>'};
+const row=t=>{const overdue=t.RecalcPct<.999999&&t.PlanEnd<r,done=t.RecalcPct>=.999999,status=done?'Đã hoàn thành':overdue?'Quá hạn · Chưa hoàn tất':t.CalcStatus,css=tone(done?'Hoàn tất':overdue?'Chậm tiến độ':t.CalcStatus);
+return '<div class="go-live-item" data-jump="'+datasetOf(t)+'|'+E(t.TaskID)+'"><div class="go-live-name" title="'+E(t.Task)+'">'+E(t.Task)+'</div><div class="go-live-meta"><span>'+E(t.TaskID)+'</span><span>Hạn: '+F(t.PlanEnd)+'</span><span class="status-pill '+css+'">'+E(status)+'</span></div></div>'};
 $('#goLiveBox').innerHTML='<div class="go-live-box"><div class="go-live-head"><div class="go-live-title">TÍNH NĂNG GO-LIVE & CÔNG VIỆC PHẢI HOÀN THÀNH TRONG THÁNG</div><div class="go-live-count">Tháng báo cáo & công việc tồn đọng</div></div><div class="go-live-grid">'+groups.map((g,i)=>{const expanded=goMore.has(i),rows=expanded?g.rows:g.rows.slice(0,3);return '<div class="go-live-col"><div class="go-live-sub"><span>'+g.title+'</span><b>'+g.rows.length+'</b></div>'+(rows.length?rows.map(row).join(''):'<div class="go-live-empty">Không có công việc phù hợp</div>')+(g.rows.length>3?'<button class="more-btn" data-gomore="'+i+'">'+(expanded?'Thu gọn':'Xem thêm ('+(g.rows.length-3)+')')+'</button>':'')+'</div>'}).join('')+'</div></div>'
 }
 
